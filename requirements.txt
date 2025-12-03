@@ -1,0 +1,2 @@
+instaloader
+slack_sdk

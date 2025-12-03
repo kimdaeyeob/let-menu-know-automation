@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+
+# Instaloader
+*.session
+*.json.xz
+
+# VSCode
+.vscode/
