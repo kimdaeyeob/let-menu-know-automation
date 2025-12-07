@@ -2,7 +2,9 @@ name: Check for new Instagram posts
 
 on:
   schedule:
-    - cron: '0 1 * * 1-4'  # Runs Mon-Thu at 1 AM UTC (10 AM KST)
+    # UTC 23:45 = KST 08:45 (다음날)
+    # 일~수(0-3) 실행 -> 한국 월~목 아침에 작동
+    - cron: '45 23 * * 0-3'
   workflow_dispatch:
 
 jobs:
