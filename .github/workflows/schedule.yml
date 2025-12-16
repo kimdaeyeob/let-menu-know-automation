@@ -4,7 +4,7 @@ on:
   schedule:
     # UTC 23:45 = KST 08:45 (다음날)
     # 일~수(0-3) 실행 -> 한국 월~목 아침에 작동
-    - cron: '45 23 * * 0-3'
+    - cron: "45 23 * * 0-3"
   workflow_dispatch:
 
 jobs:
@@ -17,7 +17,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: "3.x"
 
       - name: Install dependencies
         run: |
@@ -27,5 +27,5 @@ jobs:
       - name: Run script
         env:
           TARGET_INSTAGRAM_ID: ${{ secrets.TARGET_INSTAGRAM_ID }}
-          KAKAO_WEBHOOK_URL: ${{ secrets.KAKAO_WEBHOOK_URL }}
+          KAKAOWORK_WEBHOOK_URL: ${{ secrets.KAKAOWORK_WEBHOOK_URL_1 }}
         run: python main.py

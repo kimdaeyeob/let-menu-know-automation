@@ -4,7 +4,7 @@ on:
   schedule:
     # UTC 00:45 = KST 09:45
     # Mon-Thu (1-4) in UTC
-    - cron: "45 0 * * 1-4"
+    - cron: "15 1 * * 1-4"
   workflow_dispatch:
 
 jobs:
@@ -27,7 +27,5 @@ jobs:
       - name: Run script
         env:
           TARGET_INSTAGRAM_ID: ${{ secrets.TARGET_INSTAGRAM_ID }}
-          KAKAOWORK_WEBHOOK_URL: ${{ secrets.KAKAOWORK_WEBHOOK_URL }}
-        run: |
-          python main.py --webhook-url
-          ${{ secrets.KAKAOWORK_WEBHOOK_URL }}
+          KAKAOWORK_WEBHOOK_URL: ${{ secrets.KAKAOWORK_WEBHOOK_URL_2 }}
+        run: python main.py --webhook-url "${{ secrets.KAKAOWORK_WEBHOOK_URL_2 }}"
