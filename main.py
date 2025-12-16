@@ -115,13 +115,24 @@ def send_to_kakaowork(webhook_url, image_url):
     except requests.exceptions.RequestException as e:
         print(f"Error sending to KakaoWork: {e}")
 
+import argparse
+
 def main():
     # Load environment variables
-    username = os.environ.get("TARGET_INSTAGRAM_ID")
-    webhook_url = os.environ.get("KAKAO_WEBHOOK_URL")
+    env_username = os.environ.get("TARGET_INSTAGRAM_ID")
+    env_webhook_url = os.environ.get("KAKAO_WEBHOOK_URL")
+
+    parser = argparse.ArgumentParser(description="Send Instagram menu post to KakaoWork.")
+    parser.add_argument("--username", type=str, default=env_username, help="Target Instagram ID")
+    parser.add_argument("--webhook-url", type=str, default=env_webhook_url, help="KakaoWork Webhook URL")
+    
+    args = parser.parse_args()
+    
+    username = args.username
+    webhook_url = args.webhook_url
 
     if not username or not webhook_url:
-        print("Error: TARGET_INSTAGRAM_ID and KAKAO_WEBHOOK_URL must be set.")
+        print("Error: TARGET_INSTAGRAM_ID/--username and KAKAO_WEBHOOK_URL/--webhook-url must be set.")
         sys.exit(1)
 
     print(f"Fetching menu post from {username}...")
