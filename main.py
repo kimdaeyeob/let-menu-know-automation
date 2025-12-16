@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import sys
 import datetime
@@ -120,19 +121,27 @@ import argparse
 def main():
     # Load environment variables
     env_username = os.environ.get("TARGET_INSTAGRAM_ID")
-    env_webhook_url = os.environ.get("KAKAO_WEBHOOK_URL")
-
+    
     parser = argparse.ArgumentParser(description="Send Instagram menu post to KakaoWork.")
     parser.add_argument("--username", type=str, default=env_username, help="Target Instagram ID")
-    parser.add_argument("--webhook-url", type=str, default=env_webhook_url, help="KakaoWork Webhook URL")
+    parser.add_argument("--webhook-url", type=str, default=None, help="Full KakaoWork Webhook URL to use directly.")
+    parser.add_argument("--room", type=int, help="Room number to select webhook URL from .env (e.g., 1 for KAKAOWORK_WEBHOOK_URL_1)")
     
     args = parser.parse_args()
     
     username = args.username
     webhook_url = args.webhook_url
 
+    if not webhook_url:
+        if args.room:
+            webhook_url = os.environ.get(f"KAKAOWORK_WEBHOOK_URL_{args.room}")
+        else:
+            # Fallback to the default for backward compatibility
+            webhook_url = os.environ.get("KAKAOWORK_WEBHOOK_URL")
+
     if not username or not webhook_url:
-        print("Error: TARGET_INSTAGRAM_ID/--username and KAKAO_WEBHOOK_URL/--webhook-url must be set.")
+        print("Error: Could not determine username and webhook URL. Please check your arguments and .env file.")
+        print("Usage: python main.py [--username USER] [--webhook-url URL | --room N]")
         sys.exit(1)
 
     print(f"Fetching menu post from {username}...")
