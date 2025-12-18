@@ -2,8 +2,8 @@ name: Check for new Instagram posts (yangwoo buffet launch) > for private chat r
 
 on:
   schedule:
-    # 한국 시간 월~목 09:45 -> UTC 월~목 00:45
-    - cron: '45 0 * * 1-4'
+    # 한국 시간 월~목 10:15 -> UTC 월~목 01:15
+    - cron: '15 1 * * 1-4'
   workflow_dispatch:
 
 jobs:
@@ -26,5 +26,5 @@ jobs:
       - name: Run script
         env:
           TARGET_INSTAGRAM_ID: ${{ secrets.TARGET_INSTAGRAM_ID }}
-          KAKAOWORK_WEBHOOK_URL: ${{ secrets.KAKAOWORK_WEBHOOK_URL_1 }}
+          KAKAOWORK_WEBHOOK_URL_1: ${{ secrets.KAKAOWORK_WEBHOOK_URL_1 }}
         run: python main.py --room 1
