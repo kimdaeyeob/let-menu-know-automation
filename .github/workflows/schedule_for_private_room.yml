@@ -2,8 +2,8 @@ name: Check for new Instagram posts (yangwoo buffet launch) > for private chat r
 
 on:
   schedule:
-    # 한국 시간 월~목 10:15 -> UTC 월~목 01:15
-    - cron: '15 1 * * 1-4'
+    # 한국 시간 월~목 10:45 -> UTC 월~목 01:45
+    - cron: '45 1 * * 1-4'
   workflow_dispatch:
 
 jobs:
