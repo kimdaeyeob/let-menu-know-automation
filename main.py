@@ -134,7 +134,10 @@ def main():
 
     if not webhook_url:
         if args.room:
-            webhook_url = os.environ.get(f"KAKAOWORK_WEBHOOK_URL_{args.room}")
+            env_var = f"KAKAOWORK_WEBHOOK_URL_{args.room}"
+            webhook_url = os.environ.get(env_var)
+            if not webhook_url:
+                print(f"Warning: Environment variable '{env_var}' is empty or not set.")
         else:
             # Fallback to the default for backward compatibility
             webhook_url = os.environ.get("KAKAOWORK_WEBHOOK_URL")
