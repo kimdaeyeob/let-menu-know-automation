@@ -1,10 +1,9 @@
-name: Check for new Instagram posts - yangwoo buffet launch
+name: Check for new Instagram posts (yangwoo buffet launch) > for hamba chat room
 
 on:
   schedule:
-    # UTC 00:45 = KST 09:45
-    # Mon-Thu (1-4) in UTC
-    - cron: "15 1 * * 1-4"
+      # 한국 시간 월~목 09:45 -> UTC 월~목 00:45
+    - cron: '45 0 * * 1-4'
   workflow_dispatch:
 
 jobs:
@@ -28,4 +27,4 @@ jobs:
         env:
           TARGET_INSTAGRAM_ID: ${{ secrets.TARGET_INSTAGRAM_ID }}
           KAKAOWORK_WEBHOOK_URL: ${{ secrets.KAKAOWORK_WEBHOOK_URL_2 }}
-        run: python main.py --webhook-url "${{ secrets.KAKAOWORK_WEBHOOK_URL_2 }}"
+        run: python main.py --room 2
