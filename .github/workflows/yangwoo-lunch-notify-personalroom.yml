@@ -2,8 +2,8 @@ name: For HAMBA chat room which is check for Yangwoo buffet launch menu
 
 on:
   schedule:
-    # 한국 시간 월~목 09:00 -> UTC 월~목 00:00
-    - cron: "0 0 * * 1-4"
+    # 한국 시간 월~목 09:15 -> UTC 월~목 00:15
+    - cron: "15 0 * * 1-4"
   workflow_dispatch:
 
 jobs:
