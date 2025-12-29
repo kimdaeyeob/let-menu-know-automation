@@ -122,29 +122,58 @@ def main():
     # Load environment variables
     env_username = os.environ.get("TARGET_INSTAGRAM_ID")
     
-    parser = argparse.ArgumentParser(description="Send Instagram menu post to KakaoWork.")
+    parser = argparse.ArgumentParser(
+        description="Send Instagram menu post to KakaoWork.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python main.py --webhook-env-var KAKAOWORK_WEBHOOK_URL_HAMBAROOM
+  python main.py --webhook-env-var KAKAOWORK_WEBHOOK_URL_TEST_ROOM
+  python main.py --webhook-url https://open.kakaowork.com/v1/webhooks/...
+  python main.py --room 1  # Deprecated: Use --webhook-env-var instead
+        """
+    )
     parser.add_argument("--username", type=str, default=env_username, help="Target Instagram ID")
     parser.add_argument("--webhook-url", type=str, default=None, help="Full KakaoWork Webhook URL to use directly.")
-    parser.add_argument("--room", type=int, help="Room number to select webhook URL from .env (e.g., 1 for KAKAOWORK_WEBHOOK_URL_1)")
+    parser.add_argument(
+        "--webhook-env-var", 
+        type=str, 
+        default=None, 
+        help="Environment variable name containing the webhook URL (e.g., KAKAOWORK_WEBHOOK_URL_HAMBAROOM)"
+    )
+    parser.add_argument(
+        "--room", 
+        type=int, 
+        default=None,
+        help="[DEPRECATED] Room number to select webhook URL. Use --webhook-env-var instead for better clarity."
+    )
     
     args = parser.parse_args()
     
     username = args.username
     webhook_url = args.webhook_url
 
+    # Determine webhook URL from various sources
     if not webhook_url:
-        if args.room:
+        if args.webhook_env_var:
+            # New preferred method: directly specify environment variable name
+            webhook_url = os.environ.get(args.webhook_env_var)
+            if not webhook_url:
+                print(f"Warning: Environment variable '{args.webhook_env_var}' is empty or not set.")
+        elif args.room:
+            # Deprecated: backward compatibility for --room option
             env_var = f"KAKAOWORK_WEBHOOK_URL_{args.room}"
             webhook_url = os.environ.get(env_var)
             if not webhook_url:
                 print(f"Warning: Environment variable '{env_var}' is empty or not set.")
+            print(f"Warning: --room option is deprecated. Use --webhook-env-var {env_var} instead.")
         else:
             # Fallback to the default for backward compatibility
             webhook_url = os.environ.get("KAKAOWORK_WEBHOOK_URL")
 
     if not username or not webhook_url:
         print("Error: Could not determine username and webhook URL. Please check your arguments and .env file.")
-        print("Usage: python main.py [--username USER] [--webhook-url URL | --room N]")
+        print("Usage: python main.py [--username USER] [--webhook-url URL | --webhook-env-var ENV_VAR_NAME]")
         sys.exit(1)
 
     print(f"Fetching menu post from {username}...")
