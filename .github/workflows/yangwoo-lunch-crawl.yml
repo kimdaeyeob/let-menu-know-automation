@@ -1,0 +1,42 @@
+name: Crawl Instagram menu posts
+
+on:
+  schedule:
+    # 한국 시간 월~목 09:35 -> UTC 월~목 00:35
+    - cron: "35 0 * * Mon-Thu"
+  workflow_dispatch:
+
+jobs:
+  crawl_menu:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Get current date
+        id: get_date
+        run: echo "TODAY=$(date -u +'%Y-%m-%d')" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Crawl and cache menu data
+        env:
+          TARGET_INSTAGRAM_ID: ${{ secrets.TARGET_INSTAGRAM_ID }}
+        run: python main.py --crawl-only
+
+      - name: Upload menu cache artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: menu-cache-${{ env.TODAY }}
+          path: menu_cache.json
+          retention-days: 1
+          if-no-files-found: error
+

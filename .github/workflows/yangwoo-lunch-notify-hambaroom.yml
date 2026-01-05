@@ -2,8 +2,8 @@ name: For HAMBA chat room which is check for Yangwoo buffet launch menu
 
 on:
   schedule:
-    # 한국 시간 월~목 10:11 -> UTC 월~목 01:11
-    - cron: "11 1 * * Mon-Thu"
+    # 한국 시간 월~목 10:25 -> UTC 월~목 01:25
+    - cron: "25 1 * * Mon-Thu"
   workflow_dispatch:
 
 jobs:
@@ -22,12 +22,13 @@ jobs:
         id: get_date
         run: echo "TODAY=$(date -u +'%Y-%m-%d')" >> $GITHUB_ENV
 
-      - name: Cache menu data
-        id: cache-menu
-        uses: actions/cache@v4
+      - name: Download menu cache artifact
+        uses: actions/download-artifact@v4
         with:
-          path: menu_cache.json
-          key: menu-data-${{ env.TODAY }}
+          name: menu-cache-${{ env.TODAY }}
+          path: .
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          if-no-artifact-found: ignore
 
       - name: Install dependencies
         run: |
@@ -38,4 +39,4 @@ jobs:
         env:
           TARGET_INSTAGRAM_ID: ${{ secrets.TARGET_INSTAGRAM_ID }}
           KAKAOWORK_WEBHOOK_URL_HAMBAROOM: ${{ secrets.KAKAOWORK_WEBHOOK_URL_FOR_HAMBA_ROOM }}
-        run: python main.py --webhook-env-var KAKAOWORK_WEBHOOK_URL_HAMBAROOM
+        run: python main.py --webhook-env-var KAKAOWORK_WEBHOOK_URL_HAMBAROOM --use-cache
