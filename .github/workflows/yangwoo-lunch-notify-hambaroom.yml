@@ -28,7 +28,7 @@ jobs:
           name: menu-cache-${{ env.TODAY }}
           path: .
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          if-no-artifact-found: ignore
+          if-no-artifact-found: error
 
       - name: Install dependencies
         run: |
