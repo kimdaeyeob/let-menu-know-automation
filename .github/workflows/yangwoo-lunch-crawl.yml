@@ -2,8 +2,8 @@ name: Crawl Instagram menu posts
 
 on:
   schedule:
-    # 한국 시간 월~목 09:35 -> UTC 월~목 00:35
-    - cron: "35 0 * * Mon-Thu"
+    # 한국 시간 월~목 10:05 -> UTC 월~목 01:05
+    - cron: "05 1 * * Mon-Thu"
   workflow_dispatch:
 
 jobs:

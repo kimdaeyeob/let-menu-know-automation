@@ -2,8 +2,8 @@ name: For test room which is check for Yangwoo buffet launch menu
 
 on:
   schedule:
-    # 한국 시간 월~목 09:45 -> UTC 월~목 00:45
-    - cron: "45 0 * * Mon-Thu"
+    # 한국 시간 월~목 10:15 -> UTC 월~목 01:15
+    - cron: "15 1 * * Mon-Thu"
   workflow_dispatch:
 
 jobs:

@@ -2,8 +2,64 @@
 """
 Instagram crawler module for fetching menu posts.
 """
+import time
 import datetime
 import instaloader
+from functools import wraps
+
+
+def retry_on_rate_limit(max_retries=3, backoff_factor=2):
+    """
+    Rate limit 에러 발생 시 재시도하는 데코레이터.
+    
+    Args:
+        max_retries (int): 최대 재시도 횟수
+        backoff_factor (int): 백오프 배수 (대기 시간 = backoff_factor^attempt * 10초)
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            for attempt in range(max_retries):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    error_str = str(e)
+                    # Rate limit 관련 에러 확인
+                    is_rate_limit = (
+                        "Please wait" in error_str or
+                        "401" in error_str or
+                        "429" in error_str or
+                        "rate limit" in error_str.lower() or
+                        "Unauthorized" in error_str
+                    )
+                    
+                    if is_rate_limit and attempt < max_retries - 1:
+                        wait_time = backoff_factor ** attempt * 10
+                        print(f"Rate limit detected. Waiting {wait_time} seconds before retry {attempt + 1}/{max_retries}...")
+                        time.sleep(wait_time)
+                        continue
+                    else:
+                        # Rate limit이 아니거나 마지막 시도인 경우 에러 재발생
+                        raise
+            return None
+        return wrapper
+    return decorator
+
+
+@retry_on_rate_limit(max_retries=3, backoff_factor=2)
+def _get_profile(loader, username):
+    """
+    프로필을 가져오는 내부 함수 (재시도 로직 포함).
+    
+    Args:
+        loader: Instaloader 인스턴스
+        username (str): Instagram 사용자명
+        
+    Returns:
+        Profile: Instagram 프로필 객체
+    """
+    print(f"Fetching profile for username: {username}")
+    return instaloader.Profile.from_username(loader.context, username)
 
 
 def get_todays_menu_post(username):
@@ -18,8 +74,14 @@ def get_todays_menu_post(username):
         Post object if found, None otherwise
     """
     L = instaloader.Instaloader()
+    
     try:
-        profile = instaloader.Profile.from_username(L.context, username)
+        # 재시도 로직이 포함된 프로필 가져오기
+        try:
+            profile = _get_profile(L, username)
+        except Exception as e:
+            print(f"Error fetching profile after retries: {e}")
+            return None
         
         # Get today's date in KST
         kst_offset = datetime.timedelta(hours=9)
@@ -99,8 +161,14 @@ def find_menu_post_by_date(username, target_date):
         Post object if found, None otherwise
     """
     L = instaloader.Instaloader()
+    
     try:
-        profile = instaloader.Profile.from_username(L.context, username)
+        # 재시도 로직이 포함된 프로필 가져오기
+        try:
+            profile = _get_profile(L, username)
+        except Exception as e:
+            print(f"Error fetching profile after retries: {e}")
+            return None
         
         # Format date string to look for in caption (e.g., "12월 1일", "12월1일")
         date_str_1 = f"{target_date.month}월 {target_date.day}일"
@@ -108,9 +176,8 @@ def find_menu_post_by_date(username, target_date):
         
         print(f"Looking for posts with caption containing '{date_str_1}' or '{date_str_2}'...")
 
-        candidates = []
-        
         # Iterate through recent posts (extend search range for past dates)
+        candidates = []
         count = 0
         max_posts = 20 if target_date < datetime.date.today() else 5
         
@@ -156,4 +223,3 @@ def find_menu_post_by_date(username, target_date):
     except Exception as e:
         print(f"Error fetching post: {e}")
         return None
-
